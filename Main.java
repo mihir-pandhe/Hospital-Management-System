@@ -21,7 +21,12 @@ public class Main {
             System.out.println("4. Display Doctors");
             System.out.println("5. Schedule Appointment");
             System.out.println("6. Display Appointments");
-            System.out.println("7. Save and Exit");
+            System.out.println("7. Search Patient by ID");
+            System.out.println("8. Search Doctor by ID");
+            System.out.println("9. Report All Patients");
+            System.out.println("10. Report All Doctors");
+            System.out.println("11. Report All Appointments");
+            System.out.println("12. Save and Exit");
             System.out.print("Enter your choice: ");
 
             int choice = getIntInput();
@@ -46,6 +51,21 @@ public class Main {
                     displayAppointments();
                     break;
                 case 7:
+                    searchPatientById();
+                    break;
+                case 8:
+                    searchDoctorById();
+                    break;
+                case 9:
+                    reportAllPatients();
+                    break;
+                case 10:
+                    reportAllDoctors();
+                    break;
+                case 11:
+                    reportAllAppointments();
+                    break;
+                case 12:
                     saveData();
                     System.out.println("Exiting the system...");
                     return;
@@ -167,6 +187,60 @@ public class Main {
     }
 
     private static void displayAppointments() {
+        if (appointments.isEmpty()) {
+            System.out.println("No appointments available.");
+        } else {
+            for (Appointment appointment : appointments) {
+                System.out.println(appointment);
+            }
+        }
+    }
+
+    private static void searchPatientById() {
+        System.out.print("Enter Patient ID to search: ");
+        int id = getIntInput();
+        Patient patient = patients.get(id);
+
+        if (patient != null) {
+            System.out.println(patient);
+        } else {
+            System.out.println("Patient with ID " + id + " not found.");
+        }
+    }
+
+    private static void searchDoctorById() {
+        System.out.print("Enter Doctor ID to search: ");
+        int id = getIntInput();
+        Doctor doctor = doctors.get(id);
+
+        if (doctor != null) {
+            System.out.println(doctor);
+        } else {
+            System.out.println("Doctor with ID " + id + " not found.");
+        }
+    }
+
+    private static void reportAllPatients() {
+        if (patients.isEmpty()) {
+            System.out.println("No patients available.");
+        } else {
+            for (Patient patient : patients.values()) {
+                System.out.println(patient);
+            }
+        }
+    }
+
+    private static void reportAllDoctors() {
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors available.");
+        } else {
+            for (Doctor doctor : doctors.values()) {
+                System.out.println(doctor);
+            }
+        }
+    }
+
+    private static void reportAllAppointments() {
         if (appointments.isEmpty()) {
             System.out.println("No appointments available.");
         } else {
