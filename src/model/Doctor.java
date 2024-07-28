@@ -1,3 +1,5 @@
+package src.model;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -33,7 +35,9 @@ public class Doctor implements Serializable {
 
     @Override
     public String toString() {
-        return "Doctor ID: " + id + ", Name: " + name + ", Specialization: " + specialization;
+        return "Doctor ID: " + id +
+                ", Name: " + name +
+                ", Specialization: " + specialization;
     }
 
     @Override

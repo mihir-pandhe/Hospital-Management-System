@@ -1,3 +1,9 @@
+package src.view;
+
+import src.model.Appointment;
+import src.model.Doctor;
+import src.model.Patient;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -93,19 +99,26 @@ public class AppointmentPanel extends JPanel {
             Patient patient = patients.get(patientId);
             Doctor doctor = doctors.get(doctorId);
 
-            if (patient != null && doctor != null) {
-                Date date = dateFormat.parse(dateStr);
-                Appointment appointment = new Appointment(id, patient, doctor, date, timeStr);
-                appointments.add(appointment);
-                JOptionPane.showMessageDialog(this, "Appointment scheduled successfully.");
-                clearFields();
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid patient or doctor ID.");
+            if (patient == null) {
+                JOptionPane.showMessageDialog(this, "Invalid patient ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+            if (doctor == null) {
+                JOptionPane.showMessageDialog(this, "Invalid doctor ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Date date = dateFormat.parse(dateStr);
+            Appointment appointment = new Appointment(id, patient, doctor, date, timeStr);
+            appointments.add(appointment);
+            JOptionPane.showMessageDialog(this, "Appointment scheduled successfully.");
+            clearFields();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers for IDs.");
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers for IDs.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (ParseException e) {
-            JOptionPane.showMessageDialog(this, "Invalid date format. Please use yyyy-MM-dd.");
+            JOptionPane.showMessageDialog(this, "Invalid date format. Please use yyyy-MM-dd.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

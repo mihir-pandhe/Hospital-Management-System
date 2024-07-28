@@ -1,3 +1,5 @@
+package src.model;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -42,7 +44,10 @@ public class Patient implements Serializable {
 
     @Override
     public String toString() {
-        return "Patient ID: " + id + ", Name: " + name + ", Age: " + age + ", Gender: " + gender;
+        return "Patient ID: " + id +
+                ", Name: " + name +
+                ", Age: " + age +
+                ", Gender: " + gender;
     }
 
     @Override
