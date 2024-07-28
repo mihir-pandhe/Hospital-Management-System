@@ -1,9 +1,9 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class Main {
-    private static ArrayList<Patient> patients = new ArrayList<>();
-    private static ArrayList<Doctor> doctors = new ArrayList<>();
+    private static HashMap<Integer, Patient> patients = new HashMap<>();
+    private static HashMap<Integer, Doctor> doctors = new HashMap<>();
     private static ArrayList<Appointment> appointments = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
 
@@ -47,69 +47,96 @@ public class Main {
     }
 
     private static void addPatient() {
-        System.out.print("Enter Patient ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Patient Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter Patient Age: ");
-        int age = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Patient Gender: ");
-        String gender = scanner.nextLine();
+        try {
+            System.out.print("Enter Patient ID: ");
+            int id = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Patient Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter Patient Age: ");
+            int age = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Patient Gender: ");
+            String gender = scanner.nextLine();
 
-        patients.add(new Patient(id, name, age, gender));
-        System.out.println("Patient added successfully.");
+            if (patients.containsKey(id)) {
+                System.out.println("Patient with this ID already exists.");
+                return;
+            }
+
+            patients.put(id, new Patient(id, name, age, gender));
+            System.out.println("Patient added successfully.");
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please try again.");
+            scanner.next();
+        }
     }
 
     private static void displayPatients() {
-        for (Patient patient : patients) {
+        for (Patient patient : patients.values()) {
             System.out.println(patient);
         }
     }
 
     private static void addDoctor() {
-        System.out.print("Enter Doctor ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Doctor Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter Doctor Specialization: ");
-        String specialization = scanner.nextLine();
+        try {
+            System.out.print("Enter Doctor ID: ");
+            int id = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Doctor Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter Doctor Specialization: ");
+            String specialization = scanner.nextLine();
 
-        doctors.add(new Doctor(id, name, specialization));
-        System.out.println("Doctor added successfully.");
+            if (doctors.containsKey(id)) {
+                System.out.println("Doctor with this ID already exists.");
+                return;
+            }
+
+            doctors.put(id, new Doctor(id, name, specialization));
+            System.out.println("Doctor added successfully.");
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please try again.");
+            scanner.next();
+        }
     }
 
     private static void displayDoctors() {
-        for (Doctor doctor : doctors) {
+        for (Doctor doctor : doctors.values()) {
             System.out.println(doctor);
         }
     }
 
     private static void scheduleAppointment() {
-        System.out.print("Enter Appointment ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Patient ID: ");
-        int patientId = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Doctor ID: ");
-        int doctorId = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter Date (YYYY-MM-DD): ");
-        String date = scanner.nextLine();
-        System.out.print("Enter Time (HH:MM): ");
-        String time = scanner.nextLine();
+        try {
+            System.out.print("Enter Appointment ID: ");
+            int id = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Patient ID: ");
+            int patientId = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Doctor ID: ");
+            int doctorId = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter Date (yyyy-mm-dd): ");
+            String dateStr = scanner.nextLine();
+            System.out.print("Enter Time (hh:mm): ");
+            String time = scanner.nextLine();
 
-        Patient patient = findPatientById(patientId);
-        Doctor doctor = findDoctorById(doctorId);
-
-        if (patient != null && doctor != null) {
-            appointments.add(new Appointment(id, patient, doctor, date, time));
-            System.out.println("Appointment scheduled successfully.");
-        } else {
-            System.out.println("Invalid Patient ID or Doctor ID.");
+            Patient patient = patients.get(patientId);
+            Doctor doctor = doctors.get(doctorId);
+            if (patient != null && doctor != null) {
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
+                appointments.add(new Appointment(id, patient, doctor, date, time));
+                System.out.println("Appointment scheduled successfully.");
+            } else {
+                System.out.println("Invalid patient or doctor ID.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please try again.");
+            scanner.next();
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
         }
     }
 
@@ -117,23 +144,5 @@ public class Main {
         for (Appointment appointment : appointments) {
             System.out.println(appointment);
         }
-    }
-
-    private static Patient findPatientById(int id) {
-        for (Patient patient : patients) {
-            if (patient.getId() == id) {
-                return patient;
-            }
-        }
-        return null;
-    }
-
-    private static Doctor findDoctorById(int id) {
-        for (Doctor doctor : doctors) {
-            if (doctor.getId() == id) {
-                return doctor;
-            }
-        }
-        return null;
     }
 }
