@@ -1,23 +1,30 @@
-import java.util.*;
+import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Main {
     private static HashMap<Integer, Patient> patients = new HashMap<>();
     private static HashMap<Integer, Doctor> doctors = new HashMap<>();
     private static ArrayList<Appointment> appointments = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static void main(String[] args) {
+        loadData();
+
         while (true) {
+            System.out.println("\nHospital Management System");
             System.out.println("1. Add Patient");
             System.out.println("2. Display Patients");
             System.out.println("3. Add Doctor");
             System.out.println("4. Display Doctors");
             System.out.println("5. Schedule Appointment");
             System.out.println("6. Display Appointments");
-            System.out.println("7. Exit");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            System.out.println("7. Save and Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = getIntInput();
 
             switch (choice) {
                 case 1:
@@ -39,6 +46,8 @@ public class Main {
                     displayAppointments();
                     break;
                 case 7:
+                    saveData();
+                    System.out.println("Exiting the system...");
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -46,16 +55,23 @@ public class Main {
         }
     }
 
+    private static int getIntInput() {
+        while (!scanner.hasNextInt()) {
+            System.out.print("Invalid input. Please enter a number: ");
+            scanner.next();
+        }
+        return scanner.nextInt();
+    }
+
     private static void addPatient() {
         try {
             System.out.print("Enter Patient ID: ");
-            int id = scanner.nextInt();
+            int id = getIntInput();
             scanner.nextLine();
             System.out.print("Enter Patient Name: ");
             String name = scanner.nextLine();
             System.out.print("Enter Patient Age: ");
-            int age = scanner.nextInt();
-            scanner.nextLine();
+            int age = getIntInput();
             System.out.print("Enter Patient Gender: ");
             String gender = scanner.nextLine();
 
@@ -73,15 +89,19 @@ public class Main {
     }
 
     private static void displayPatients() {
-        for (Patient patient : patients.values()) {
-            System.out.println(patient);
+        if (patients.isEmpty()) {
+            System.out.println("No patients available.");
+        } else {
+            for (Patient patient : patients.values()) {
+                System.out.println(patient);
+            }
         }
     }
 
     private static void addDoctor() {
         try {
             System.out.print("Enter Doctor ID: ");
-            int id = scanner.nextInt();
+            int id = getIntInput();
             scanner.nextLine();
             System.out.print("Enter Doctor Name: ");
             String name = scanner.nextLine();
@@ -102,32 +122,36 @@ public class Main {
     }
 
     private static void displayDoctors() {
-        for (Doctor doctor : doctors.values()) {
-            System.out.println(doctor);
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors available.");
+        } else {
+            for (Doctor doctor : doctors.values()) {
+                System.out.println(doctor);
+            }
         }
     }
 
     private static void scheduleAppointment() {
         try {
             System.out.print("Enter Appointment ID: ");
-            int id = scanner.nextInt();
+            int id = getIntInput();
             scanner.nextLine();
             System.out.print("Enter Patient ID: ");
-            int patientId = scanner.nextInt();
-            scanner.nextLine();
+            int patientId = getIntInput();
             System.out.print("Enter Doctor ID: ");
-            int doctorId = scanner.nextInt();
+            int doctorId = getIntInput();
             scanner.nextLine();
-            System.out.print("Enter Date (yyyy-mm-dd): ");
+            System.out.print("Enter Date (yyyy-MM-dd): ");
             String dateStr = scanner.nextLine();
-            System.out.print("Enter Time (hh:mm): ");
-            String time = scanner.nextLine();
+            System.out.print("Enter Time (HH:mm): ");
+            String timeStr = scanner.nextLine();
 
             Patient patient = patients.get(patientId);
             Doctor doctor = doctors.get(doctorId);
+
             if (patient != null && doctor != null) {
-                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-                appointments.add(new Appointment(id, patient, doctor, date, time));
+                Date date = dateFormat.parse(dateStr);
+                appointments.add(new Appointment(id, patient, doctor, date, timeStr));
                 System.out.println("Appointment scheduled successfully.");
             } else {
                 System.out.println("Invalid patient or doctor ID.");
@@ -135,14 +159,64 @@ public class Main {
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please try again.");
             scanner.next();
+        } catch (ParseException e) {
+            System.out.println("Invalid date or time format. Please try again.");
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
 
     private static void displayAppointments() {
-        for (Appointment appointment : appointments) {
-            System.out.println(appointment);
+        if (appointments.isEmpty()) {
+            System.out.println("No appointments available.");
+        } else {
+            for (Appointment appointment : appointments) {
+                System.out.println(appointment);
+            }
+        }
+    }
+
+    private static void saveData() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("hospital_data.dat"))) {
+            oos.writeObject(patients);
+            oos.writeObject(doctors);
+            oos.writeObject(appointments);
+            System.out.println("Data saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error saving data: " + e.getMessage());
+        }
+    }
+
+    private static void loadData() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("hospital_data.dat"))) {
+            Object obj = ois.readObject();
+            if (obj instanceof HashMap<?, ?>) {
+                @SuppressWarnings("unchecked")
+                HashMap<Integer, Patient> patientsTemp = (HashMap<Integer, Patient>) obj;
+                patients = patientsTemp;
+            }
+
+            obj = ois.readObject();
+            if (obj instanceof HashMap<?, ?>) {
+                @SuppressWarnings("unchecked")
+                HashMap<Integer, Doctor> doctorsTemp = (HashMap<Integer, Doctor>) obj;
+                doctors = doctorsTemp;
+            }
+
+            obj = ois.readObject();
+            if (obj instanceof ArrayList<?>) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Appointment> appointmentsTemp = (ArrayList<Appointment>) obj;
+                appointments = appointmentsTemp;
+            }
+
+            System.out.println("Data loaded successfully.");
+        } catch (FileNotFoundException e) {
+            System.out.println("No previous data found. Starting with empty data.");
+        } catch (IOException e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Error loading data: Class not found.");
         }
     }
 }
